@@ -18,7 +18,7 @@ catch(err){
         
         },
 
-        authUser:async(_,_,contextValue)=>{
+        authUser:async(_, _,contextValue)=>{
             try{
                 const user = await contextValue.getUser()
                 return user ; 
