@@ -6,9 +6,9 @@ const userResolver = {
 
     Query:{
        
-        user:(_,{userId})=>{
+        user:async(_,{userId})=>{
 try{
-  const user =   User.findById(userId)
+  const user = await  User.findById(userId)
   return user ; 
 
 }
@@ -18,25 +18,21 @@ catch(err){
         
         },
 
-        authUser:async(_, _,contextValue)=>{
-            try{
-                const user = await contextValue.getUser()
-                return user ; 
-
+        authUser: async (_, __, contextValue) => {
+            try {
+              const user = await contextValue.getUser();
+              return user;
+            } catch (err) {
+              console.log("Error in auth user", err);
+              throw new Error(err.message || "Internal Server Error");
             }
-            catch(err){
-                console.log("err in auth user", err)
-                throw new Error(err.message || "Internal server errror")
-
-            }
-
-        }
+          },
 
     },
     Mutation:{
-        signUp:async(_, { input}, contextValue)=>{
+        signup:async(_, { input}, contextValue)=>{
             try {
-                const {username ,name, password , gender } = input ;
+                const {username ,name, password ,email, gender } = input ;
 
             if(!username || !name || !password || !gender){
                 throw new Error("Please enter all the fields")
@@ -86,7 +82,7 @@ catch(err){
     }
 
 },
-logout:async(_ , _ ,contextValue)=>{
+logout:async(_ , __ ,contextValue)=>{
     try{
         await contextValue.logout()
        req.session.destroy((err)=>{

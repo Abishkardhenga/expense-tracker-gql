@@ -1,4 +1,4 @@
-import mongoose, { mongo } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const transactionSchema = new Schema({
     userId:{
@@ -14,12 +14,12 @@ const transactionSchema = new Schema({
     paymentType:{
         type:String,
         enum:["Cash", "Card"],
-        required:True
+        required:true
     },
      category:{
         type:String,
         enum:["Investment", "Saving","Expense"],
-        required:True
+        required:true
     },
     amount:{
         type:Number,

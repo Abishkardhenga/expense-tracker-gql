@@ -21,7 +21,7 @@ user(userId:ID!):User
 type Mutation { 
 signup(input:SignupInput!):User
 login(input:LoginInput!):User
-logogut: LogoutResponse
+logout: LogoutResponse
 }
 
 
