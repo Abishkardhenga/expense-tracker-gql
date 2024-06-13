@@ -11,8 +11,8 @@ import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHt
 import connectMongoose from './db/connectDb.js';
 import passport from 'passport';
 import session from 'express-session';
-import connectMongo  from 'connect-mongodb-session';
-import {   buildContext } from "graphql-passport"
+import connectMongo from 'connect-mongodb-session';
+import { buildContext } from "graphql-passport"
 import configurePassport from "./Passport/passport.config.js"
 dotenv.config()
 configurePassport()
@@ -24,48 +24,48 @@ const httpServer = http.createServer(app);
 const MongoDBStore = connectMongo(session)
 
 const store = new MongoDBStore({
-  uri:process.env.MONGODB_URI,
-  collection:"sessions"
+  uri: process.env.MONGODB_URI,
+  collection: "sessions"
 
 })
-store.on("error",(err)=> console.log(err))
+store.on("error", (err) => console.log(err))
 app.use(
   session({
-    secret:process.env.SESSION_SECRET,
-     resave:false,
-    saveUninitialized:false,
-    cookie:{
-    maxAge:1000*60*60*24*7,
-    httpOnly:true, //this option prevents cross site scripting (XSS) attacks
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      httpOnly: true, //this option prevents cross site scripting (XSS) attacks
     },
-    store:store
+    store: store
   })
 )
 app.use(passport.initialize())
 app.use(passport.session())
 
 const server = new ApolloServer({
-    typeDefs:mergedTypeDefs,
-    resolvers:mergedResolvers,
-    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+  typeDefs: mergedTypeDefs,
+  resolvers: mergedResolvers,
+  plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 
-  });
-  await server.start();
+});
+await server.start();
 
-  app.use(
-    '/graphql',
-    cors({
-      origin:"http://localhost:5173",
-      credentials:true
-    }),
-    express.json(),
-    
-    expressMiddleware(server, {
-      context: async ({ req , res}) => buildContext({ req , res}),
-    }),
-  );
-  
-  await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
-  
-  console.log(`🚀 Server ready at http://localhost:4000/`);
-  await connectMongoose()
+app.use(
+  '/graphql',
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true
+  }),
+  express.json(),
+
+  expressMiddleware(server, {
+    context: async ({ req, res }) => buildContext({ req, res }),
+  }),
+);
+
+await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
+
+console.log(`🚀 Server ready at http://localhost:4000/`);
+await connectMongoose()
