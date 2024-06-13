@@ -22,7 +22,7 @@ profilePicture:{
 },
 gender:{
     type:String,
-    enum:["Male", "Female"]
+    enum:["male", "female"]
 }
 
 },{timestamps:true})

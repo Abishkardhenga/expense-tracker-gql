@@ -32,24 +32,24 @@ const userResolver = {
     Mutation: {
         signup: async (_, { input }, contextValue) => {
             try {
-                const { username, name, password, email, gender } = input;
+                const { username, name, password, gender } = input;
 
                 if (!username || !name || !password || !gender) {
                     throw new Error("Please enter all the fields")
                 }
 
-                const existingUser = User.findOne({ username })
+                const existingUser = await User.findOne({ username })
                 if (existingUser) {
                     throw new Error("User Exist Already")
                 }
-                const salt = await bcrypt.genSalt(50);
+                const salt = await bcrypt.genSalt(10);
                 const hashedPassword = await bcrypt.hash(password, salt)
 
                 const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`
                 const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`
                 const newUser = new User({
                     username,
-                    email,
+                    name,
                     password: hashedPassword,
                     gender,
                     profilePicture: gender === "Male" ? boyProfilePic : girlProfilePic
