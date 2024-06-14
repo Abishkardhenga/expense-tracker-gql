@@ -8,6 +8,7 @@ import TransactionForm from "../components/TransactionForm";
 import toast from "react-hot-toast";
 import { useMutation } from "@apollo/client";
 import { LOGOUT_MUTATION } from "../graphql/mutations/user.mutation";
+import { GET_AUTHENTICATED_USER } from "../graphql/queries/user.query";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -28,7 +29,9 @@ const HomePage = () => {
 		],
 	};
 
-	const [ logout , { loading, error}] = useMutation(LOGOUT_MUTATION)
+	const [ logout , { loading, error}] = useMutation(LOGOUT_MUTATION, {
+		refetchQueries:[GET_AUTHENTICATED_USER]
+	})
 	const handleLogout = async() => {
 		try {
 			await logout()
