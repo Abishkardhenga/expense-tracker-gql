@@ -68,29 +68,50 @@ const userResolver = {
 
 
 
-        }
-        , login: async (_, { input }, contextValue) => {
+        },
+        login: async (_, { input }, contextValue) => {
             try {
                 const { username, password } = input;
-                const { user } = await contextValue.authenticate("graphql-local", { username, password })
-                await contextValue.login(user)
+                console.log("username", username)
+                console.log("password", password)
+        
+                if (!username || !password) {
+                    throw new Error("Username and password are required.");
+                }
+        
+                const { user } = await contextValue.authenticate("graphql-local", { username, password });
+                console.log("user", user)
+                await contextValue.login(user);
                 return user;
-
             } catch (error) {
-                throw new Error(error.message || "Internal Server Error")
-
+                console.error("Login error:", error);
+                throw new Error("Invalid username or password. Please try again.");
             }
-
         },
+        
         logout: async (_, __, contextValue) => {
             try {
+
+
+
+                 // Check if contextValue.res is defined
+        if (!contextValue.req) {
+            throw new Error("Response object (res) is not available in the context");
+        }
+
+
+        // Check if contextValue.res.session is defined
+        if (!contextValue.req.session) {
+            throw new Error("Session object is not available on the response object (res)");
+        }
+
                 await contextValue.logout()
-                req.session.destroy((err) => {
+                await contextValue.req.session.destroy((err) => {
                     if (err) throw new Error(err.message)
 
                 })
 
-                res.clearcookie("connect.sid")
+                await contextValue.res.clearCookie("connect.sid")
                 return { message: "Logout successfully " }
 
 

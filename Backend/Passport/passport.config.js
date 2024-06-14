@@ -1,55 +1,45 @@
 import passport from "passport";
-import bycrypt from "bcryptjs"
-import User from "../models/user.model.js"
+import bcrypt from "bcryptjs"; // Fixed typo from 'bycrypt' to 'bcrypt'
+import User from "../models/user.model.js";
 import { GraphQLLocalStrategy } from "graphql-passport";
 
-
-const configurePassport = async () => {
+const configurePassport = () => {
     passport.serializeUser((user, done) => {
-        console.log("Serializing user")
-        done(null, user.id)
-    })
+        console.log("Serializing user");
+        done(null, user.id);
+    });
 
     passport.deserializeUser(async (id, done) => {
-
-        console.log("Deserailing user")
-        const user = User.findById(id)
-        done(null, user)
-
+        console.log("Deserializing user");
         try {
-
+            const user = await User.findById(id); // Added 'await'
+            done(null, user);
         } catch (error) {
-            done(error)
-
+            done(error);
         }
-    })
+    });
+
     passport.use(
-
-
         new GraphQLLocalStrategy(
             async (username, password, done) => {
-
                 try {
-                    const user = User.findOne({ username })
+                    const user = await User.findOne({ username }); // Added 'await'
                     if (!user) {
-                        throw new Error("Invalid username or password")
+                        return done(new Error("Invalid username or password"));
                     }
-                    const validPassword = await bycrypt.compare(password, user.password)
-                    if (!validPassword) {
-                        throw new Error("Invalie username or password")
-                    }
-                    return done(null, user);
 
+                    const validPassword = await bcrypt.compare(password, user.password); // Added 'await'
+                    if (!validPassword) {
+                        return done(new Error("Invalid username or password"));
+                    }
+
+                    return done(null, user);
                 } catch (error) {
                     return done(error);
-
                 }
-
             }
         )
-
-    )
-}
-
+    );
+};
 
 export default configurePassport;

@@ -1,6 +1,9 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import InputField from "../components/InputField";
+import { useMutation } from "@apollo/client";
+import { LOGIN_MUTATION } from "../graphql/mutations/user.mutation";
+import toast from "react-hot-toast";
 
 const LoginPage = () => {
 	const [loginData, setLoginData] = useState({
@@ -16,9 +19,25 @@ const LoginPage = () => {
 		}));
 	};
 
-	const handleSubmit = (e) => {
-		e.preventDefault();
-		console.log(loginData);
+
+	const [login, {loading }]=useMutation(LOGIN_MUTATION)
+	const handleSubmit = async(e) => {
+
+		try {
+			e.preventDefault();
+		const loginUser = 	await login({
+				 variables:{
+					input:loginData
+				}
+			})
+			console.log("login user", loginUser)
+			toast.success("Loginned successfull")
+			
+		} catch (error) {
+			toast.error(error.message  )
+			
+		}
+		console.log("user Input",loginData);
 	};
 
 	return (
@@ -52,9 +71,13 @@ const LoginPage = () => {
 									type='submit'
 									className='w-full bg-black text-white p-2 rounded-md hover:bg-gray-800 focus:outline-none focus:bg-black  focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 transition-colors duration-300
 										disabled:opacity-50 disabled:cursor-not-allowed
-									'
+										'
+										disabled={loading}
 								>
-									Login
+									
+									{
+loading? "Loading ...." : "Login"
+									}
 								</button>
 							</div>
 						</form>
