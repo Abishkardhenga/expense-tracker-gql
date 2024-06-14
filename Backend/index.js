@@ -28,7 +28,6 @@ const store = new MongoDBStore({
 
 store.on("error", (err) => console.log(err));
 
-// Set up session middleware
 app.use(
   session({
     secret: process.env.SESSION_SECRET,

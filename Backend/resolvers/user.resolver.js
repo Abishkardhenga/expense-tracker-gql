@@ -85,7 +85,7 @@ const userResolver = {
                 return user;
             } catch (error) {
                 console.error("Login error:", error);
-                throw new Error("Invalid username or password. Please try again.");
+                throw new Error(error.message);
             }
         },
         
@@ -94,22 +94,17 @@ const userResolver = {
 
 
 
-                 // Check if contextValue.res is defined
-        if (!contextValue.req) {
-            throw new Error("Response object (res) is not available in the context");
-        }
-
-
-        // Check if contextValue.res.session is defined
-        if (!contextValue.req.session) {
-            throw new Error("Session object is not available on the response object (res)");
-        }
+       
 
                 await contextValue.logout()
-                await contextValue.req.session.destroy((err) => {
-                    if (err) throw new Error(err.message)
-
-                })
+                await new Promise((resolve, reject) => {
+                    contextValue.req.session.destroy((err) => {
+                      if (err) {
+                        return reject(new Error(err.message));
+                      }
+                      resolve();
+                    });
+                  });
 
                 await contextValue.res.clearCookie("connect.sid")
                 return { message: "Logout successfully " }
