@@ -1,7 +1,6 @@
 import { gql } from "@apollo/client";
 
 
-
 export const CREATE_TRANSACTION = gql`
 
 mutation createTransaction($input:CreateTransactionInput!){
@@ -46,7 +45,6 @@ mutation updateTransaction($input:updateTransactionInput!){
 
 
 `
-
 
 
 export const DELETE_TRANSACTION = gql`
