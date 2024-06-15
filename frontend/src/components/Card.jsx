@@ -5,6 +5,9 @@ import { FaSackDollar } from "react-icons/fa6";
 import { FaTrash } from "react-icons/fa";
 import { HiPencilAlt } from "react-icons/hi";
 import { Link } from "react-router-dom";
+import { useMutation } from "@apollo/client";
+import { DELETE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
+import toast from "react-hot-toast";
 
 const categoryColorMap = {
 	saving: "from-green-700 to-green-400",
@@ -13,8 +16,28 @@ const categoryColorMap = {
 	// Add more categories and corresponding color classes as needed
 };
 
-const Card = ({ cardType }) => {
+const Card = ({ transaction  }) => {
+	let  { } = transaction ; 
+
+	console.log("vitra  Ko card Ko transaction ", transaction._id)
+	let cardType; 
 	const cardClass = categoryColorMap[cardType];
+
+	let [ deleteTransaction, {loading }] = useMutation(DELETE_TRANSACTION)
+
+
+	const deleteCard =async (id)=>{
+		try {
+			console.log("id", id)
+			await deleteTransaction(id)
+			toast.success("successfully delete the card ")
+			alert(id)
+		} catch (error) {
+			toast.error(error.message)
+			
+		}
+
+	}
 
 	return (
 		<div className={`rounded-md p-4 bg-gradient-to-br ${cardClass}`}>
@@ -22,7 +45,9 @@ const Card = ({ cardType }) => {
 				<div className='flex flex-row items-center justify-between'>
 					<h2 className='text-lg font-bold text-white'>Saving</h2>
 					<div className='flex items-center gap-2'>
-						<FaTrash className={"cursor-pointer"} />
+						<FaTrash  onClick={()=>{
+							deleteCard(transaction._id)
+						}}  className={"cursor-pointer"} />
 						<Link to={`/transaction/123`}>
 							<HiPencilAlt className='cursor-pointer' size={20} />
 						</Link>

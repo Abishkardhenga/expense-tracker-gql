@@ -34,9 +34,10 @@ const transactionResolver = {
         createTransaction: async (_, { input }, contextValue) => {
             try {
 
+                console.log("this is context value", contextValue.getUser())
                 const newTranscation = new Transaction({
                     ...input,
-                    userId: contextValue.getUser()._id
+                    userId: contextValue?.getUser()?._id
                 })
                 await newTranscation.save()
                 return newTranscation;

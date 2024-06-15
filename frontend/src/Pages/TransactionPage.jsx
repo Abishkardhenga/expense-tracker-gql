@@ -1,5 +1,8 @@
 import { useState } from "react";
 import TransactionFormSkeleton from "../components/skeletons/TransactionFormSkeleton";
+import { useMutation } from "@apollo/client";
+import { UPDATE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
+import toast from "react-hot-toast";
 
 const TransactionPage = () => {
 	const [formData, setFormData] = useState({
@@ -11,8 +14,23 @@ const TransactionPage = () => {
 		date: "",
 	});
 
+
+	const [updateTransaction,{loading}] = useMutation(UPDATE_TRANSACTION)
 	const handleSubmit = async (e) => {
 		e.preventDefault();
+		try {
+			const updatedTransaction = await updateTransaction({
+				variables:{
+					input:formData
+				}
+			})
+
+			console.log("updateTransaction", updateTransaction)
+			toast.success("Successfulyy updated the transaction ")
+		} catch (error) {
+			toast.error(error.message)
+			
+		}
 		console.log("formData", formData);
 	};
 	const handleInputChange = (e) => {
