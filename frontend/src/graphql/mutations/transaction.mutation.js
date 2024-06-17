@@ -24,17 +24,14 @@ mutation createTransaction($input:CreateTransactionInput!){
 
 
 export const UPDATE_TRANSACTION = gql`
-mutation updateTransaction($input:updateTransactionInput!){
+mutation updateTransaction($input:UpdateTransactionInput!){
     updateTransaction(input:$input){
 
     
         _id
     amount
-    category
-    date
     description
     location
-    paymentType
     userId
 
 

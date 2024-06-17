@@ -1,32 +1,78 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import TransactionFormSkeleton from "../components/skeletons/TransactionFormSkeleton";
-import { useMutation } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { UPDATE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
 import toast from "react-hot-toast";
+import { useParams } from "react-router-dom";
+import { GET_TRANSACTION } from "../graphql/queries/transaction.query";
 
 const TransactionPage = () => {
-	const [formData, setFormData] = useState({
+	const { id } = useParams()
+
+
+	const { data , error }= useQuery(GET_TRANSACTION, { 
+		variables:{
+			transactionId : id
+		}
+
+	})
+
+	const initialFormData = {
 		description: "",
 		paymentType: "",
 		category: "",
 		amount: "",
 		location: "",
 		date: "",
+	  };
+	const [formData, setFormData] = useState({
+		description: data?.transaction?.description || "",
+		paymentType: data?.transaction?.paymentType || "",
+		category: data?.transaction?.category || "",
+		amount: data?.transaction?.amount || "",
+		location: data?.transaction?.location || "",
+		date: data?.transaction?.date,
 	});
 
 
-	const [updateTransaction,{loading}] = useMutation(UPDATE_TRANSACTION)
+	useEffect(()=>{
+		if(data){
+			setFormData({
+				description: data?.transaction?.description ,
+		paymentType: data?.transaction?.paymentType ,
+		category: data?.transaction?.category ,
+		amount: data?.transaction?.amount ,
+		location: data?.transaction?.location ,
+		date: new Date(+data?.transaction?.date).toISOString().substr(0,10),
+			})
+		}
+
+	},[data])
+
+	console.log("id", id)
+
+
+
+	console.log("single transaction ", data)
+
+
+	const [updateTransaction,{loading : loadingUpdate , error: errorUpdate}] = useMutation(UPDATE_TRANSACTION)
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {
+			const amount = parseFloat(formData.amount)
 			const updatedTransaction = await updateTransaction({
 				variables:{
-					input:formData
+					input:{...formData,
+						amount ,
+						transactionId:id
+					}
 				}
 			})
 
 			console.log("updateTransaction", updateTransaction)
 			toast.success("Successfulyy updated the transaction ")
+			setFormData(initialFormData)
 		} catch (error) {
 			toast.error(error.message)
 			
@@ -41,8 +87,9 @@ const TransactionPage = () => {
 		}));
 	};
 
+	
 	// if (loading) return <TransactionFormSkeleton />;
-
+	
 	return (
 		<div className='h-screen max-w-4xl mx-auto flex flex-col items-center'>
 			<p className='md:text-4xl text-2xl lg:text-4xl font-bold text-center relative z-50 mb-4 mr-4 bg-gradient-to-r from-pink-600 via-indigo-500 to-pink-400 inline-block text-transparent bg-clip-text'>
@@ -86,8 +133,8 @@ const TransactionPage = () => {
 								onChange={handleInputChange}
 								defaultValue={formData.paymentType}
 							>
-								<option value={"card"}>Card</option>
-								<option value={"cash"}>Cash</option>
+								<option value={"Card"}>Card</option>
+								<option value={"Cash"}>Cash</option>
 							</select>
 							<div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
 								<svg
@@ -117,9 +164,9 @@ const TransactionPage = () => {
 								onChange={handleInputChange}
 								defaultValue={formData.category}
 							>
-								<option value={"saving"}>Saving</option>
-								<option value={"expense"}>Expense</option>
-								<option value={"investment"}>Investment</option>
+								<option value={"Saving"}>Saving</option>
+								<option value={"Expense"}>Expense</option>
+								<option value={"Investment"}>Investment</option>
 							</select>
 							<div className='pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700'>
 								<svg

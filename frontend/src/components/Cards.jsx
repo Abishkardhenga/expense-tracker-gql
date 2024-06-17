@@ -1,11 +1,11 @@
 import { useQuery } from "@apollo/client";
 import Card from "./Card";
-import { GET_TRANSACTION } from "../graphql/queries/transaction.query";
+import {  GET_TRANSACTIONS } from "../graphql/queries/transaction.query";
 
 const Cards = () => {
 
 
-	const { data, error , loading } = useQuery(GET_TRANSACTION)
+	const { data, error , loading } = useQuery(GET_TRANSACTIONS)
 
 	console.log("card data", data)
 	if(loading) return <p>loading....</p>

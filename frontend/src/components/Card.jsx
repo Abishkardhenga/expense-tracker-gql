@@ -8,22 +8,26 @@ import { Link } from "react-router-dom";
 import { useMutation } from "@apollo/client";
 import { DELETE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
 import toast from "react-hot-toast";
+import { formatDate } from "../utilis/formatDate";
+import {  GET_TRANSACTIONS } from "../graphql/queries/transaction.query";
 
 const categoryColorMap = {
-	saving: "from-green-700 to-green-400",
-	expense: "from-pink-800 to-pink-600",
-	investment: "from-blue-700 to-blue-400",
-	// Add more categories and corresponding color classes as needed
+	Saving: "from-green-700 to-green-400",
+	Expense: "from-pink-800 to-pink-600",
+	Investment: "from-blue-700 to-blue-400",
 };
 
+
 const Card = ({ transaction  }) => {
-	let  { } = transaction ; 
+	let  { amount, category , date , description , location , paymentType, userId, _id} = transaction ; 
+	 description = description[0].toUpperCase() + description.slice(1)
+	 date = formatDate(date)
 
-	console.log("vitra  Ko card Ko transaction ", transaction._id)
-	let cardType; 
-	const cardClass = categoryColorMap[cardType];
+	const cardClass = categoryColorMap[category];
 
-	let [ deleteTransaction, {loading }] = useMutation(DELETE_TRANSACTION)
+	let [ deleteTransaction, {loading }] = useMutation(DELETE_TRANSACTION,{
+		refetchQueries:[GET_TRANSACTIONS]
+	})
 
 
 	const deleteCard =async (id)=>{
@@ -46,34 +50,34 @@ const Card = ({ transaction  }) => {
 		<div className={`rounded-md p-4 bg-gradient-to-br ${cardClass}`}>
 			<div className='flex flex-col gap-3'>
 				<div className='flex flex-row items-center justify-between'>
-					<h2 className='text-lg font-bold text-white'>Saving</h2>
+					<h2 className='text-lg font-bold text-white'>{category}</h2>
 					<div className='flex items-center gap-2'>
 						<FaTrash  onClick={()=>{
 							deleteCard(transaction._id)
 						}}  className={"cursor-pointer"} />
-						<Link to={`/transaction/123`}>
+						<Link to={`/transaction/${transaction._id}`}>
 							<HiPencilAlt className='cursor-pointer' size={20} />
 						</Link>
 					</div>
 				</div>
 				<p className='text-white flex items-center gap-1'>
 					<BsCardText />
-					Description: Salary
+					Description: {description}
 				</p>
 				<p className='text-white flex items-center gap-1'>
 					<MdOutlinePayments />
-					Payment Type: Cash
+					Payment Type: {paymentType}
 				</p>
 				<p className='text-white flex items-center gap-1'>
 					<FaSackDollar />
-					Amount: $150
+					Amount: ${amount}
 				</p>
 				<p className='text-white flex items-center gap-1'>
 					<FaLocationDot />
-					Location: New York
+					Location: {location}
 				</p>
 				<div className='flex justify-between items-center'>
-					<p className='text-xs text-black font-bold'>21 Sep, 2001</p>
+					<p className='text-xs text-black font-bold'>{date}</p>
 					<img
 						src={"https://tecdn.b-cdn.net/img/new/avatars/2.webp"}
 						className='h-8 w-8 border rounded-full'
