@@ -42,3 +42,15 @@ transaction(transactionId:$transactionId){
 
 
 `
+
+
+export const GET_CATEGORY_STATISTICS = gql `
+query categoryStatistics{
+    categoryStatistics{
+        totalAmount , 
+        category
+        
+    }
+}
+
+`
