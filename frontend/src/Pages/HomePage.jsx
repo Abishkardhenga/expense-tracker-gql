@@ -8,7 +8,7 @@ import TransactionForm from "../components/TransactionForm";
 import toast from "react-hot-toast";
 import { useMutation, useQuery } from "@apollo/client";
 import { LOGOUT_MUTATION } from "../graphql/mutations/user.mutation";
-import { GET_AUTHENTICATED_USER } from "../graphql/queries/user.query";
+import { GET_AUTHENTICATED_USER, GET_USER_TRANSACTION } from "../graphql/queries/user.query";
 import { GET_CATEGORY_STATISTICS } from "../graphql/queries/transaction.query";
 import { useEffect, useState } from "react";
 
@@ -22,6 +22,13 @@ const HomePage = () => {
 		refetchQueries: [GET_AUTHENTICATED_USER]
 	})
 
+
+	const { data:UserRelation} = useQuery(GET_USER_TRANSACTION,{
+		variables:{
+			userId:AuthenticatedUserData?.authUser?._id
+		}
+	})
+	console.log("user realtion",UserRelation)
 
 
 	const [chartData, setChartData] = useState({
