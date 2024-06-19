@@ -27,25 +27,28 @@ const transactionResolver = {
             }
 
         },
-        categoryStatistics : async(_, __, contextValue)=>{
+        categoryStatistics: async (_, __, contextValue) => {
             try {
-                if(!contextValue.getUser()) return new MessageChannel("Unauthorized Access ")
-                    const userId = contextValue.getUser().id ; 
-                 const transactions =    await Transaction.findById({userId})
-                 const categoryMap = {}; 
-                 transactions.forEach((transaction)=>{
-                    if(!categoryMap[transaction.category]){
-                        categoryMap[transaction.category] = 0 ;
+                if (!contextValue.getUser()) return new MessageChannel("Unauthorized Access ")
+                const userId = contextValue.getUser().id;
+                const transactions = await Transaction.find({ userId })
+                const categoryMap = {};
+                transactions.forEach((transaction) => {
+                    if (!categoryMap[transaction.category]) {
+                        categoryMap[transaction.category] = 0;
                     }
                     categoryMap[transaction.category] += transaction.amount
-                 })
-return Object.entries(categoryMap).map((category , totalAmount )=>{
-    category , totalAmount
+                })
+                return Object.entries(categoryMap).map(([category, totalAmount]) => {
+                    return { category, totalAmount };
 
-})
+                })
 
-                
+
             } catch (error) {
+                console.log("error")
+                console.log("category error", error)
+                console.log("category error", error.message)
                 throw new Error(error.message || "Internal Server Error")
             }
         }

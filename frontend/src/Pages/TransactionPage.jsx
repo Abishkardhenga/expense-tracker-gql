@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@apollo/client";
 import { UPDATE_TRANSACTION } from "../graphql/mutations/transaction.mutation";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import { GET_TRANSACTION } from "../graphql/queries/transaction.query";
+import { GET_CATEGORY_STATISTICS, GET_TRANSACTION } from "../graphql/queries/transaction.query";
 
 const TransactionPage = () => {
 	const { id } = useParams()
@@ -56,7 +56,9 @@ const TransactionPage = () => {
 	console.log("single transaction ", data)
 
 
-	const [updateTransaction,{loading : loadingUpdate , error: errorUpdate}] = useMutation(UPDATE_TRANSACTION)
+	const [updateTransaction,{loading : loadingUpdate , error: errorUpdate}] = useMutation(UPDATE_TRANSACTION,{
+		refetchQueries:[GET_CATEGORY_STATISTICS]
+	})
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 		try {

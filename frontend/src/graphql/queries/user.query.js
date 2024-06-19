@@ -7,6 +7,8 @@ query authenticated_user {
 
     authUser {
     _id
+    profilePicture
+    name
   }
 
 

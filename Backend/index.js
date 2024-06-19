@@ -28,29 +28,33 @@ const store = new MongoDBStore({
 
 store.on("error", (err) => console.log(err));
 
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
-      httpOnly: true, // Prevents cross-site scripting (XSS) attacks
-    },
-    store: store
-  })
-);
+// Use CORS middleware
+app.use(cors({
+  origin: "http://localhost:3000",
+  credentials: true
+}));
 
-app.use((req, res, next) => {
-  // console.log(req.session);
-  next();
-});
+// Use body-parser middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
+// Use session middleware
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24 * 7, // 1 week
+    httpOnly: true, // Prevents cross-site scripting (XSS) attacks
+  },
+  store: store
+}));
 
 // Initialize passport and passport session
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Apollo Server setup
 const server = new ApolloServer({
   typeDefs: mergedTypeDefs,
   resolvers: mergedResolvers,
@@ -61,17 +65,19 @@ await server.start();
 
 app.use(
   '/graphql',
-  cors({
-    origin: "http://localhost:3000",
-    credentials: true
-  }),
-  express.json(),
   expressMiddleware(server, {
     context: async ({ req, res }) => buildContext({ req, res }),
   }),
 );
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+// Start the server and connect to the database
 await new Promise((resolve) => httpServer.listen({ port: 4000 }, resolve));
 
-console.log(`🚀 Server ready at http://localhost:4000/`);
+console.log(`🚀 Server ready at http://localhost:4000/graphql`);
 await connectMongoose();

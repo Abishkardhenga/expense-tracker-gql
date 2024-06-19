@@ -33,42 +33,42 @@ const userResolver = {
         signup: async (_, { input }, contextValue) => {
             try {
                 const { username, name, password, gender } = input;
-
+        
                 if (!username || !name || !password || !gender) {
-                    throw new Error("Please enter all the fields")
+                    throw new Error("Please enter all the fields");
                 }
-
-                const existingUser = await User.findOne({ username })
+        
+                const existingUser = await User.findOne({ username });
                 if (existingUser) {
-                    throw new Error("User Exist Already")
+                    throw new Error("User already exists");
                 }
+        
                 const salt = await bcrypt.genSalt(10);
-                const hashedPassword = await bcrypt.hash(password, salt)
-
-                const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`
-                const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`
+                const hashedPassword = await bcrypt.hash(password, salt);
+        
+                const profilePicture = gender === "male"
+                    ? `https://avatar.iran.liara.run/public/boy?username=${username}`
+                    : `https://avatar.iran.liara.run/public/girl?username=${username}`;
+        
                 const newUser = new User({
                     username,
                     name,
                     password: hashedPassword,
                     gender,
-                    profilePicture: gender === "Male" ? boyProfilePic : girlProfilePic
-
-                })
-                await newUser.save()
-                await contextValue.login(newUser)
+                    profilePicture
+                });
+        
+                await newUser.save();
+        
+                await contextValue.login(newUser);
+        
                 return newUser;
-
             } catch (error) {
-                console.log("Signup Error", error)
-                throw new Error(error.message || "Internal Server Error")
-
+                console.error("Signup Error", error);
+                throw new Error(error.message || "Internal Server Error");
             }
-
-
-
-
-        },
+        }
+        ,
         login: async (_, { input }, contextValue) => {
             try {
                 const { username, password } = input;
